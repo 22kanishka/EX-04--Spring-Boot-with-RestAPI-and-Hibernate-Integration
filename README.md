@@ -1,16 +1,16 @@
 # Exp-04-Spring-Boot-with-REST-API-and-Hibernate-Integration
 
 ## AIM:
+
 To develop a Spring Boot application to store and retrieve data from a Movies database using Object Relational Mapping (ORM) with Hibernate and expose it via REST APIs.
 
 ## ALGORITHM:
+
 Create Spring Boot project with dependencies:
 
-Spring Web
-
-Spring Data JPA
-
-H2 or MySQL Database
+- Spring Web
+- Spring Data JPA
+- H2 or MySQL Database
 
 Configure application.properties with DB connection and JPA settings.
 
@@ -20,24 +20,42 @@ Create MovieRepository interface extending JpaRepository.
 
 Create MovieController to define REST endpoints for CRUD operations:
 
-GET /movies
+- GET /movies
+- GET /movies/{id}
+- POST /movies
+- PUT /movies/{id}
+- DELETE /movies/{id}
 
-GET /movies/{id}
+## Program:
 
-POST /movies
-
-PUT /movies/{id}
-
-DELETE /movies/{id}
-
-
-## PROGRAM CODE (Main Files):
 ### application.properties
+
+```properties
+spring.application.name=movie
+
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
 ### Movie.java
+
+```java
+package com.example.movies.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Movie {
@@ -46,20 +64,54 @@ public class Movie {
     private Long id;
     private String title;
     private String genre;
-    private int year;
+    @Column(name = "release_year")
+    private int releaseYear;
     private double rating;
 
-    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getGenre() { return genre; }
+    public void setGenre(String genre) { this.genre = genre; }
+    public int getReleaseYear() { return releaseYear; }
+    public void setReleaseYear(int releaseYear) { this.releaseYear = releaseYear; }
+    public double getRating() { return rating; }
+    public void setRating(double rating) { this.rating = rating; }
 }
+```
+
 ### MovieRepository.java
-java
-Copy
-Edit
-public interface MovieRepository extends JpaRepository<Movie, Long> {}
+
+```java
+package com.example.movies.repository;
+
+import com.example.movies.model.Movie;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MovieRepository extends JpaRepository<Movie, Long> {
+}
+```
+
 ### MovieController.java
+
+```java
+package com.example.movies.controller;
+
+import com.example.movies.model.Movie;
+import com.example.movies.repository.MovieRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
+
     @Autowired
     private MovieRepository repo;
 
@@ -85,17 +137,40 @@ public class MovieController {
         return repo.findById(id).map(movie -> {
             movie.setTitle(movieDetails.getTitle());
             movie.setGenre(movieDetails.getGenre());
-            movie.setYear(movieDetails.getYear());
+            movie.setReleaseYear(movieDetails.getReleaseYear());
             movie.setRating(movieDetails.getRating());
             return ResponseEntity.ok(repo.save(movie));
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteMovie(@PathVariable Long id) {
         return repo.findById(id).map(movie -> {
             repo.delete(movie);
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
     }
 }
+```
+
+## Output
+
+### POST /movies
+
+![alt text](image.png)
+
+### GET /movies
+
+![alt text](image-1.png)
+
+### PUT /movies/{id}
+
+![alt text](image-2.png)
+
+### DELETE /movies/{id}
+
+![alt text](image-3.png)
+
+## Result
+
+Thus the development of a Spring Boot application to store and retrieve data from a Movies database is completed successfully
