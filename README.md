@@ -1,5 +1,6 @@
 # Exp-04-Spring-Boot-with-REST-API-and-Hibernate-Integration
-
+## NAME: KANISHKA P
+## REG NO: 2305001011
 ## AIM:
 
 To develop a Spring Boot application to store and retrieve data from a Movies database using Object Relational Mapping (ORM) with Hibernate and expose it via REST APIs.
